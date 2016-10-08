@@ -7,6 +7,7 @@ var sqMiles = 398.21;
 
 var key = "AIzaSyCDW-naC3PPNM6OE_3Xii6vfiLs9Vwe7nY";
 var APITokenDetroitCrime = "8OPUdNc6B2smGxTa8vDn8Rpki";
+var crimeAverage;
 // Longitude and Latitude
 function success(position) 
 {
@@ -222,5 +223,56 @@ $(document).ready(function()
 });
 
 
+<<<<<<< HEAD
+=======
+function getCrimeDataByCoordinates(data)
+{
+  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
+  var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
+  var finalUrlString = baseUrlString.concat(dateParamter);
+    $.ajax({
+        url: finalUrlString,
+        type: "GET",
+        data: {
+          "$$app_token" : APITokenDetroitCrime
+        }
+    }).success(function(response) {
+      alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
+>>>>>>> master
 
+
+function getRankedCrimes(rank)
+{
+  if (rank == 1)
+  {
+    var upperBound = 15000;
+    var lowerBound = 9000;
+  }
+  else if (rank == 2)
+  {
+    var upperBound = 25000;
+    var lowerBound = 15000;   
+  }
+  else //rank = 3
+  {
+    var upperBound = 32000;
+    var lowerBound = 25000;   
+  }
+
+  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=stateoffensefileclass between " + lowerBound + " and " + upperBound;
+  var dateParameter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
+  var finalUrlString = baseUrlString.concat(dateParameter);
+    $.ajax({
+        url: finalUrlString,
+        type: "GET",
+        data: {
+          "$$app_token" : APITokenDetroitCrime
+        }
+    }).success(function(responseFilteredRank) {
+
+      alert("Retrieved " + responseFilteredRank.length + " of rank " + rank + ".");
+      console.log(responseFilteredRank);
+
+    });
+}
 
