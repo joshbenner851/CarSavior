@@ -1,6 +1,7 @@
 var longitude = -83.045754;
 var latitude = 42.331427;
-var key = "AIzaSyCDW-naC3PPNM6OE_3Xii6vfiLs9Vwe7nY"
+var key = "AIzaSyCDW-naC3PPNM6OE_3Xii6vfiLs9Vwe7nY";
+var APITokenDetroitCrime = "8OPUdNc6B2smGxTa8vDn8Rpki";
 // Longitude and Latitude
     function success(position) {
       longitude = position.coords.longitude;
@@ -85,12 +86,12 @@ function getCrimeDataByCoordinates(data)
 {
   var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
   var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
-  var finalUrlString = urlString.concat(dateParamter);
+  var finalUrlString = baseUrlString.concat(dateParamter);
     $.ajax({
         url: finalUrlString,
         type: "GET",
         data: {
-          "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
+          "$$app_token" : APITokenDetroitCrime
         }
     }).success(function(response) {
       alert("Retrieved " + response.length + " records from the dataset!");
