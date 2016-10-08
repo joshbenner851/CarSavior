@@ -1,12 +1,18 @@
 var longitude = maxLong = minLong = -83.114405;
 var latitude = maxLat = minLat =  42.435412;
 var numOfCrimes;
+
 //Total area: 398.21 mi² (1,031.36 km²)
 var sqMiles = 398.21;
 var key = "AIzaSyCDW-naC3PPNM6OE_3Xii6vfiLs9Vwe7nY";
 var APITokenDetroitCrime = "8OPUdNc6B2smGxTa8vDn8Rpki";
 var crimeAverage;
-// Longitude and Latitude
+
+var blockToLatitude = .5 / 69;
+var blockToLongitude = .5 / 69;
+var avgCrimePerSqMi, avgCrimePer8thMi;
+
+
 function success(position) 
 {
   longitude = position.coords.longitude;
@@ -96,27 +102,6 @@ function initMap()
   var map = new google.maps.Map(document.getElementById("map"), mapOptions);
 }
 
-
-/*function showSpeed(data) {
->>>>>>> master
-=======
-/*function showSpeed(data) {
->>>>>>> master
-  console.log(data);
-  var speed = data.average_speed;
-  if (speed !== undefined) {
-    var speedText = document.getElementById('speed');
-    // speedText.innerHTML = speed;
-  }
-}*/ 
-    
-    //gm.info.watchVehicleData(showSpeed, ['average_speed']);
-    //gm.info.getVehicleData(showSpeed, ['average_speed']);
-
-
-
-
-
 /*
 Longitude
 Latitude
@@ -134,8 +119,7 @@ function getCrimeDataByYear()
         }
     }
 
-});
-    }).success(function(resp){
+    ).success(function(resp){
         console.log(resp.length);
         var count = 0;
         _.each(resp,function(item){
@@ -155,23 +139,6 @@ function getCrimeDataByYear()
         console.log(count);
         console.log("MinLat: " + minLat + " MaxLat: " + maxLat + " MinLong: " + minLong + " MaxLong: " + maxLong);
     });
-
-    // $.ajax({
-    //     url: "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'",
-    //     // https://data.detroitmi.gov/resource/8p3f-52zg.json?incidentdate=2012-12-27T00:00:00.000
-    //     type: "GET",
-    //     data: {
-    //       //"$limit" : 5000,
-    //       "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
-    //     }
-    // }).success(function(response) {
-    //   //build datastructures by distance away from us
-    //   console.log(response[0].location.coordinates);
-    //   var closeLocations = _.filter(response, function(response){ return  (response.location.coordinates[0] - longitude) <= 2 });
-    //   console.log(closeLocations);
-    //   // alert("Retrieved " + response.length + " records from the dataset!");
-    //   // console.log(response);
-    // });
 }
 
 $(document).ready(function() 
@@ -239,7 +206,8 @@ function getCrimeDataByCoordinates(lati, longi)
           "$$app_token" : APITokenDetroitCrime
         }
     }).success(function(response) {
-      alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
+      //alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
+      return response.length;
     });  
 }
 
@@ -267,7 +235,12 @@ function getCrimeStatistics() {
     $.each( values, function() {
       crimeWeightedTotal += $(this).length;
     });
-     alert("Crime Total: (not weighted yet) :"+ crimeWeightedTotal);
+     alert("Crime Total: "+ crimeWeightedTotal);
+     var crimePoints = crimeWeightedTotal;
+     avgCrimePerSqMi = crimePoints / sqMiles;
+     //We'll be pulling data around you by the 8th of a mile radius so we need to convert
+     avgCrimePer8thMi = avgCrimePerSqMi / 8;
+     getVariance();
   });
 }
 
@@ -302,15 +275,13 @@ function getRankedCrimes(rank)
         }
     }).success(function(responseFilteredRank) {
 
-      alert("Retrieved " + responseFilteredRank.length + " of rank " + rank + ".");
+      alert("Retrieved: " + responseFilteredRank.length + " of rank " + rank + ".");
       // console.log(responseFilteredRank);
-      // return responseFilteredRank.length;
+      return responseFilteredRank.length;
 
     });
 
 }
-
-
 
 //var density = Average Crime pts per sq mile
 //Convert to Crime pts per .125 of a mile = aka var density =/ 8
@@ -320,8 +291,10 @@ function getRankedCrimes(rank)
 
 //1 degree latitude = 69 miles
 // X degree's latitude = .125 miles
-var blockToLatitude = .5 / 69;
-var blockToLongitude = .5 / 69;
+
+
+
+
 //MinLat: 42.2556 MaxLat: 42.5442 MinLong: -83.2975 MaxLong: -82.9099
 function getVariance()
 {
@@ -329,22 +302,25 @@ function getVariance()
   var numOfDistricts = 0;
   console.log("start adding shit");
   //Loop through the whole block of lat/longs that we have to calculate the 
-  for(var i = 42.2556; i < 45.5442; i += blockToLatitude)
+  for(var i = minLat; i < minLat + blockToLatitude*3; i += blockToLatitude)
   {
-    for(var x = -83.2975; x < -82.9099; x += blockToLongitude)
+    for(var x = minLong; x < minLong + blockToLongitude * 3; x += blockToLongitude)
     {
       //Fix this to take any coordinates;
       //Return the crime points for that district
       //.125 
-      //var diff = Math.pow((getCrimeDataByCoordinates(i,x) - avgCrimePer8thMi),2);
-      //sumDifferences += sumDifferences;
+      //This is returning null for some reason, the getCrimeData is being weird. I think it has to do with the function
+      //calling a promise and it not returning in time
+      var diff = Math.pow((getCrimeDataByCoordinates(i,x) - avgCrimePer8thMi),2);
+      sumDifferences += diff;
       numOfDistricts++;
     }
   }
   console.log("finished adding shit" , numOfDistricts);
-  //var variance = sumDifferences / numOfDistricts;
-
-  //var std = Math.pow(variance,.5);
+  console.log("sumDifferences: " + sumDifferences);
+  var variance = sumDifferences / numOfDistricts;
+  console.log("Variance is: " + variance);
+  var std = Math.pow(variance,.5);
 
 }
 //variance = sum(# - Avg) / radius
@@ -352,17 +328,29 @@ function getVariance()
 //Have to calculate the the Crime points for every radius of .125
 //We should make a significant amount of calls unless filtering is going to be easier(highly doubtful)
 
-
-
 //FUCK MY LIFE
 function calculateStatistics(stuff)
 {
-  var avgCrimePerSqMi = crimePoints / sqMiles;
-  //We'll be pulling data around you by the 8th of a mile radius so we need to convert
-  var avgCrimePer8thMi = avgCrimePerSqMi / 8;
+  
   var p = (num - avgCrimePer8thMi) / stdDev;
 
 
 
 }
+    // $.ajax({
+    //     url: "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'",
+    //     // https://data.detroitmi.gov/resource/8p3f-52zg.json?incidentdate=2012-12-27T00:00:00.000
+    //     type: "GET",
+    //     data: {
+    //       //"$limit" : 5000,
+    //       "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
+    //     }
+    // }).success(function(response) {
+    //   //build datastructures by distance away from us
+    //   console.log(response[0].location.coordinates);
+    //   var closeLocations = _.filter(response, function(response){ return  (response.location.coordinates[0] - longitude) <= 2 });
+    //   console.log(closeLocations);
+    //   // alert("Retrieved " + response.length + " records from the dataset!");
+    //   // console.log(response);
+    // });
 
