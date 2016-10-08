@@ -132,9 +132,6 @@ function getCrimeDataByYear()
           //"$limit" : 5000,
           "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
         }
-    }
-
-});
     }).success(function(resp){
         console.log(resp.length);
         var count = 0;
@@ -251,24 +248,27 @@ function getDistrictCrime(latitude, longitude)
   });
 }
 
+// 
 function getCrimeStatistics() {
   var rankedCrimes = []
-  rankedCrimes.push(getRankedCrimes(3));
   rankedCrimes.push(getRankedCrimes(1));
-
   rankedCrimes.push(getRankedCrimes(2));
-  // $.when(rankedCrimes).then( function(results){
-  //       alert('all complete');
-  // });
+  rankedCrimes.push(getRankedCrimes(3));
 
   Promise.all(rankedCrimes).then(values => { 
-   
     var crimeWeightedTotal = 0;
+    var i = 1;
     $.each( values, function() {
-      crimeWeightedTotal += $(this).length;
+      crimeWeightedTotal += ($(this).length)*i;
+      i++;
     });
-     alert("Crime Total: (not weighted yet) :"+ crimeWeightedTotal);
+     alert("Crime Weighted Total: "+ crimeWeightedTotal);
   });
+}
+
+function getRankedCrimesForDistrict()
+{
+
 }
 
 function getRankedCrimes(rank)
@@ -301,10 +301,8 @@ function getRankedCrimes(rank)
           "$$app_token" : APITokenDetroitCrime
         }
     }).success(function(responseFilteredRank) {
-
-      alert("Retrieved " + responseFilteredRank.length + " of rank " + rank + ".");
-      // console.log(responseFilteredRank);
-      // return responseFilteredRank.length;
+      // alert("Retrieved " + responseFilteredRank.length + " of rank " + rank + ".");
+      console.log(responseFilteredRank);
 
     });
 
@@ -351,8 +349,6 @@ function getVariance()
 
 //Have to calculate the the Crime points for every radius of .125
 //We should make a significant amount of calls unless filtering is going to be easier(highly doubtful)
-
-
 
 //FUCK MY LIFE
 function calculateStatistics(stuff)
