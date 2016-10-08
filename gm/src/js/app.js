@@ -245,28 +245,50 @@ function getCrimeDataByCoordinates(data)
       alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
 
 
+function getCrimeStatistics() {
+  var rankedCrimes = []
+  rankedCrimes.push(getRankedCrimes(3));
+  rankedCrimes.push(getRankedCrimes(1));
+
+  rankedCrimes.push(getRankedCrimes(2));
+  // $.when(rankedCrimes).then( function(results){
+  //       alert('all complete');
+  // });
+
+  Promise.all(rankedCrimes).then(values => { 
+   
+    var crimeWeightedTotal = 0;
+    $.each( values, function() {
+      crimeWeightedTotal += $(this).length;
+    });
+     alert("Crime Total: (not weighted yet) :"+ crimeWeightedTotal);
+  });
+}
+
 function getRankedCrimes(rank)
 {
-  if (rank == 1)
-  {
-    var upperBound = 15000;
-    var lowerBound = 9000;
-  }
-  else if (rank == 2)
-  {
-    var upperBound = 25000;
-    var lowerBound = 15000;   
-  }
-  else //rank = 3
+  if (rank == 3) // Worst crimes, murder  etc
   {
     var upperBound = 32000;
-    var lowerBound = 25000;   
+    var lowerBound = 25000; 
+
+  }
+  else if (rank == 2) // armed robberies etc.
+  {
+    var upperBound = 24999;
+    var lowerBound = 15001;   
+  }
+  else if (rank == 1)
+
+  {
+    var upperBound = 15000;
+    var lowerBound = 8000; 
   }
 
   var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=stateoffensefileclass between " + lowerBound + " and " + upperBound;
   var dateParameter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
   var finalUrlString = baseUrlString.concat(dateParameter);
-    $.ajax({
+  return $.ajax({
         url: finalUrlString,
         type: "GET",
         data: {
@@ -275,9 +297,11 @@ function getRankedCrimes(rank)
     }).success(function(responseFilteredRank) {
 
       alert("Retrieved " + responseFilteredRank.length + " of rank " + rank + ".");
-      console.log(responseFilteredRank);
+      // console.log(responseFilteredRank);
+      // return responseFilteredRank.length;
 
     });
+
 }
 
 
