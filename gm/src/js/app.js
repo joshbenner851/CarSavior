@@ -63,6 +63,14 @@ function showHelpOil() {
     $('#oilVideo').toggle();
 }
 
+function showHelpHeadlight() {
+    $('#headlightVideo').toggle();
+}
+
+function showHelpOil() {
+    $('#oilVideo').toggle();
+}
+
 function processData(data) {
   console.log('got vehicle data: ', data);
   if (data.teen_drowsy_alerts > 3) {
@@ -78,6 +86,7 @@ function processData(data) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Intialize our map
 function initMap()
 {
@@ -90,6 +99,9 @@ function initMap()
 }
 
 function showSpeed(data) {
+=======
+/*function showSpeed(data) {
+>>>>>>> master
 =======
 /*function showSpeed(data) {
 >>>>>>> master
@@ -121,6 +133,7 @@ $(document).ready(function() {
     
     //gm.info.watchVehicleData(showSpeed, ['average_speed']);
     //gm.info.getVehicleData(showSpeed, ['average_speed']);
+<<<<<<< HEAD
 >>>>>>> master
 
 /*
@@ -176,6 +189,8 @@ function getCrimeDataByYear()
     //   // console.log(response);
     // });
 }
+=======
+>>>>>>> master
 
 $(document).ready(function() 
 {
