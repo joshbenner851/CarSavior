@@ -1,0 +1,12 @@
+{
+  "name":"myGm",
+  "id":"96476336",
+  "version": "0.1.0",
+  "src": "src",
+  "dist": "dist",
+  "main": "index.html",
+  "icon": "Icon.png",
+  "developer": "Josh Benner",
+  "category":"General",
+  "type":"RemoteHigh"
+}
