@@ -70,9 +70,23 @@ $(document).ready(function() {
     
     gm.info.watchVehicleData(showActive, ['teen_driver_active']);
 
-    
-    
-
     gm.info.watchPosition(success, true);
     
 });
+
+
+function getCrimeDataByCoordinates(longitude, latitude)
+{
+    $.ajax({
+        url: "https://data.detroitmi.gov/resource/8p3f-52zg.json",
+        type: "GET",
+        data: {
+          "$limit" : 5000,
+          "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
+        }
+    }).success(function(response) {
+      alert("Retrieved " + response.length + " records from the dataset!");
+      console.log(response);
+    });
+}
+
