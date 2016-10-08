@@ -9,7 +9,6 @@
 
     <!-- Your custom files -->
     <link rel="stylesheet" href="css/app.css" type="text/css">
-
     <script src="GMLIB/info.js"></script>
     <script src="GMLIB/system.js"></script>
     <!-- Uncomment libraries as you need them: -->
@@ -37,13 +36,17 @@
             <button id="safe">Is it safe to park?</button>
             <h3 id="safeStatus">...</h3>
         </div>
-
+        <div id="map" /> 
       </div>
     </div>
 
     <!-- Your app code: -->
+    
     <script src="js/jquery.js"></script>
     <script src="js/app.js"></script>
-    
+    <script  src="js/my.js"></script>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDW-naC3PPNM6OE_3Xii6vfiLs9Vwe7nY&callback=initMap">
+    </script>
   </body>
 </html>

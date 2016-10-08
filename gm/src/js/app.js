@@ -40,19 +40,61 @@ function processData(data) {
   }
 }
 
-function showSpeed(data) {
-  console.log(data);
-  var speed = data.average_speed;
-  if (speed !== undefined) {
-    var speedText = document.getElementById('speed');
-    speedText.innerHTML = speed;
+// Intialize our map
+  function initMap(){
+    var center = new google.maps.LatLng(42.351517,-83.0705137);
+    var mapOptions = {
+      zoom: 8,
+      center: center
+    }
+    var map = new google.maps.Map(document.getElementById("map"), mapOptions);
   }
+
+function getCrimeDataByCoordinates(longitude, latitude)
+{
+
+
+    
+    
+    // Retrieve our data and plot it
+    $.ajax({
+        url: "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'",
+        // https://data.detroitmi.gov/resource/8p3f-52zg.json?incidentdate=2012-12-27T00:00:00.000
+        type: "GET",
+        data: {
+          //"$limit" : 5000,
+          "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
+        }
+    }).success(function(resp){
+        $.each(resp, function(i, entry) {
+              var marker = new google.maps.Marker({
+                  position: new google.maps.LatLng(entry.location.coordinates[1], 
+                                                   entry.location.coordinates[0]),
+                  setMap: map,
+              });
+          });
+    });
+
+    // $.ajax({
+    //     url: "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'",
+    //     // https://data.detroitmi.gov/resource/8p3f-52zg.json?incidentdate=2012-12-27T00:00:00.000
+    //     type: "GET",
+    //     data: {
+    //       //"$limit" : 5000,
+    //       "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
+    //     }
+    // }).success(function(response) {
+    //   //build datastructures by distance away from us
+    //   console.log(response[0].location.coordinates);
+    //   var closeLocations = _.filter(response, function(response){ return  (response.location.coordinates[0] - longitude) <= 2 });
+    //   console.log(closeLocations);
+    //   // alert("Retrieved " + response.length + " records from the dataset!");
+    //   // console.log(response);
+    // });
 }
 
 $(document).ready(function() {
     
-    gm.info.watchVehicleData(showSpeed, ['average_speed']);
-    gm.info.getVehicleData(showSpeed, ['average_speed']);
 
     // Call processData will all available signals. Expect a 5+ second delay before callback is triggered
     gm.info.getVehicleData(processData);
@@ -75,19 +117,5 @@ $(document).ready(function() {
 });
 
 
-function getCrimeDataByCoordinates(longitude, latitude)
-{
-    $.ajax({
-        url: "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'",
-        // https://data.detroitmi.gov/resource/8p3f-52zg.json?incidentdate=2012-12-27T00:00:00.000
-        type: "GET",
-        data: {
-          //"$limit" : 5000,
-          "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
-        }
-    }).success(function(response) {
-      alert("Retrieved " + response.length + " records from the dataset!");
-      console.log(response);
-    });
-}
+
 
