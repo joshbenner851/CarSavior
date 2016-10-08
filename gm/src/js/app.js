@@ -3,8 +3,6 @@ var latitude = maxLat = minLat =  42.435412;
 var numOfCrimes;
 //Total area: 398.21 mi² (1,031.36 km²)
 var sqMiles = 398.21;
-
-
 var key = "AIzaSyCDW-naC3PPNM6OE_3Xii6vfiLs9Vwe7nY";
 var APITokenDetroitCrime = "8OPUdNc6B2smGxTa8vDn8Rpki";
 var crimeAverage;
@@ -115,6 +113,16 @@ function initMap()
     //gm.info.watchVehicleData(showSpeed, ['average_speed']);
     //gm.info.getVehicleData(showSpeed, ['average_speed']);
 
+
+
+//var density = Average Crime pts per sq mile
+//Convert to Crime pts per .125 of a mile = aka var density =/ 8
+
+// p value = Avg/.125mi - Avg 
+// Divided by the std dev
+
+//variance = sum(# - Avg) / radius
+
 /*
 Longitude
 Latitude
@@ -189,15 +197,6 @@ $(document).ready(function()
 
   var id = gm.info.watchVehicleData(processData, ['teen_drowsy_alerts','airbag_deployed']);
 
-
-  //Teen Active Alerter
-  function showActive(data) {
-      if (data.teen_driver_active == '$1') {
-          $.post("https://maker.ifttt.com/trigger/active_teen/with/key/d-_zxVjZpr34awx2JXkRXM");
-          gm.info.getCurrentPosition(success, true);
-      }
-  }
-  
   gm.info.watchVehicleData(showActive, ['teen_driver_active']);
 
   // Commented for testing purposes. Hard coded longitude / latitude above
@@ -206,7 +205,17 @@ $(document).ready(function()
   gm.info.watchVehicleData(getHeadlight, ['bulb_center_fail']);
   gm.info.watchVehicleData(getOil, ['change_oil_ind']);
   
-  //Watch Headlight Malfunction
+});
+
+//Teen Active Alerter
+  function showActive(data) {
+      if (data.teen_driver_active == '$1') {
+          $.post("https://maker.ifttt.com/trigger/active_teen/with/key/d-_zxVjZpr34awx2JXkRXM");
+          gm.info.getCurrentPosition(success, true);
+      }
+  }
+
+//Watch Headlight Malfunction
   function getHeadlight(data) {
       if (data.bulb_center_fail == 1) {
           $('#headlightTitle').fadeIn(100);
@@ -220,11 +229,7 @@ $(document).ready(function()
       }
   }
 
-});
 
-
-<<<<<<< HEAD
-=======
 function getCrimeDataByCoordinates(data)
 {
   var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
@@ -238,7 +243,6 @@ function getCrimeDataByCoordinates(data)
         }
     }).success(function(response) {
       alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
->>>>>>> master
 
 
 function getRankedCrimes(rank)
@@ -274,5 +278,18 @@ function getRankedCrimes(rank)
       console.log(responseFilteredRank);
 
     });
+}
+
+
+
+function calculateStatistics(stuff)
+{
+  var avgCrimePerSqMi = crimePoints / sqMiles;
+  //We'll be pulling data around you by the 8th of a mile radius so we need to convert
+  var avgCrimePer8thMi = avgCrimePerSqMi / 8;
+  var p = (num - avgCrimePer8thMi) / stdDev;
+
+
+
 }
 
