@@ -41,3 +41,11 @@
     border: solid;
     border-color:darkred;
 }
+
+#footer {
+    float: right;
+    font-size: 10px;
+    position: relative;
+    top:7px;
+    right:10px;
+}
