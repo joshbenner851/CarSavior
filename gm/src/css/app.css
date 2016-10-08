@@ -42,10 +42,34 @@
     border-color:darkred;
 }
 
+#next {
+    float: right;
+    position: absolute;
+    left: 85%;
+    bottom:8%;
+    padding: 10px 10px;
+}
+
+#headlightTitle {
+    color: red;
+}
+
+#headlightTitle:hover {
+    text-decoration: underline;
+}
+
+#oilTitle {
+    color: red;
+}
+
+#oilTitle:hover {
+    text-decoration: underline;
+}
+
 #footer {
     float: right;
     font-size: 10px;
-    position: relative;
-    top:7px;
-    right:10px;
+    position: absolute;
+    top:92%;
+    left:56%;
 }
