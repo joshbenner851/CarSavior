@@ -20,3 +20,8 @@
     font-size: 8em;
     line-height: .8em;
 }
+
+#safe {
+    background-color: aqua;
+    padding: 15px 32px;
+}
