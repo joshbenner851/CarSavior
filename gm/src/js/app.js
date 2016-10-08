@@ -115,13 +115,7 @@ function initMap()
 
 
 
-//var density = Average Crime pts per sq mile
-//Convert to Crime pts per .125 of a mile = aka var density =/ 8
 
-// p value = Avg/.125mi - Avg 
-// Divided by the std dev
-
-//variance = sum(# - Avg) / radius
 
 /*
 Longitude
@@ -243,7 +237,8 @@ function getCrimeDataByCoordinates(data)
         }
     }).success(function(response) {
       alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
-
+    });  
+}
 
 function getCrimeStatistics() {
   var rankedCrimes = []
@@ -306,6 +301,49 @@ function getRankedCrimes(rank)
 
 
 
+//var density = Average Crime pts per sq mile
+//Convert to Crime pts per .125 of a mile = aka var density =/ 8
+
+// p value = Avg/.125mi - Avg 
+// Divided by the std dev
+
+//1 degree latitude = 69 miles
+// X degree's latitude = .125 miles
+var blockToLatitude = .5 / 69;
+var blockToLongitude = .5 / 69;
+//MinLat: 42.2556 MaxLat: 42.5442 MinLong: -83.2975 MaxLong: -82.9099
+function getVariance()
+{
+  var sumDifferences;
+  var numOfDistricts = 0;
+  console.log("start adding shit");
+  //Loop through the whole block of lat/longs that we have to calculate the 
+  for(var i = 42.2556; i < 45.5442; i += blockToLatitude)
+  {
+    for(var x = -83.2975; x < -82.9099; x += blockToLongitude)
+    {
+      //Fix this to take any coordinates;
+      //Return the crime points for that district
+      //.125 
+      //var diff = Math.pow((getCrimeDataByCoordinates(i,x) - avgCrimePer8thMi),2);
+      //sumDifferences += sumDifferences;
+      numOfDistricts++;
+    }
+  }
+  console.log("finished adding shit" , numOfDistricts);
+  //var variance = sumDifferences / numOfDistricts;
+
+  //var std = Math.pow(variance,.5);
+
+}
+//variance = sum(# - Avg) / radius
+
+//Have to calculate the the Crime points for every radius of .125
+//We should make a significant amount of calls unless filtering is going to be easier(highly doubtful)
+
+
+
+//FUCK MY LIFE
 function calculateStatistics(stuff)
 {
   var avgCrimePerSqMi = crimePoints / sqMiles;
