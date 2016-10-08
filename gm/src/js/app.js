@@ -78,10 +78,11 @@ $(document).ready(function() {
 function getCrimeDataByCoordinates(longitude, latitude)
 {
     $.ajax({
-        url: "https://data.detroitmi.gov/resource/8p3f-52zg.json",
+        url: "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'",
+        // https://data.detroitmi.gov/resource/8p3f-52zg.json?incidentdate=2012-12-27T00:00:00.000
         type: "GET",
         data: {
-          "$limit" : 5000,
+          //"$limit" : 5000,
           "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
         }
     }).success(function(response) {
