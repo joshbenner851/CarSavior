@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <gmWebApp>
-  <AppID>96476336</AppID>
+  <AppID>0</AppID>
   <AppType>RemoteHigh</AppType>
-  <FriendlyName>myGm</FriendlyName>
+  <FriendlyName>Hello World</FriendlyName>
   <VehicleStatus>Drive</VehicleStatus>
   <AutoStart>false</AutoStart>
   <AppCategory>General</AppCategory>
@@ -10,8 +10,8 @@
   <MainURL>index.html</MainURL>
   <AppVersion>0.1.0</AppVersion>
   <SetupURL>setup.html</SetupURL>
-  <LocalPath>App96476336</LocalPath>
-  <Developer>Josh Benner</Developer>
+  <LocalPath>App0</LocalPath>
+  <Developer>Nikush Dalia</Developer>
   <TrustedApp>false</TrustedApp>
   <RequestedBy>1</RequestedBy>
   <TestApp>true</TestApp>
