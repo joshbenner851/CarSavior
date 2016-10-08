@@ -132,6 +132,9 @@ function getCrimeDataByYear()
           //"$limit" : 5000,
           "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
         }
+    }
+
+});
     }).success(function(resp){
         console.log(resp.length);
         var count = 0;
@@ -224,12 +227,12 @@ $(document).ready(function()
   }
 
 
-function getCrimeDataByCoordinates(data)
+function getCrimeDataByCoordinates(lati, longi)
 {
-  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
+  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + lati + ", "+ longi +", 500)";
   var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
   var finalUrlString = baseUrlString.concat(dateParamter);
-    $.ajax({
+  return $.ajax({
         url: finalUrlString,
         type: "GET",
         data: {
@@ -238,6 +241,14 @@ function getCrimeDataByCoordinates(data)
     }).success(function(response) {
       alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
     });  
+}
+
+function getDistrictCrime(latitude, longitude)
+{
+  var districtCrimes = getCrimeDataByCoordinates(latitude, longitude);
+  Promise.all([districtCrimes]).then(values => {
+    return values[0].length;
+  });
 }
 
 function getCrimeStatistics() {
