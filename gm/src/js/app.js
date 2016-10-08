@@ -1,5 +1,7 @@
-var longitude = -83.114405;
-var latitude = 42.435412;
+var longitude = maxLong = minLong = -83.114405;
+var latitude = maxLat = minLat =  42.435412;
+var numOfCrimes;
+//Total area: 398.21 mi² (1,031.36 km²)
 
 var key = "AIzaSyCDW-naC3PPNM6OE_3Xii6vfiLs9Vwe7nY";
 var APITokenDetroitCrime = "8OPUdNc6B2smGxTa8vDn8Rpki";
@@ -87,6 +89,60 @@ function showSpeed(data) {
   }
 }
 
+
+/*
+Longitude
+Latitude
+*/
+function getCrimeDataByYear()
+{
+    // Retrieve our data and plot it
+    $.ajax({
+        url: "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'",
+        // https://data.detroitmi.gov/resource/8p3f-52zg.json?incidentdate=2012-12-27T00:00:00.000
+        type: "GET",
+        data: {
+          //"$limit" : 5000,
+          "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
+        }
+    }).success(function(resp){
+        console.log(resp.length);
+        var count = 0;
+        _.each(resp,function(item){
+          //longitude
+          var longit = item.location.coordinates[0];
+          var latit = item.location.coordinates[1];
+          if(longit < minLong && longit >= -180){minLong = longit;}
+          else if(longit > maxLong && longit <= 180){maxLong = longit;}
+          //Latitude
+          else if(latit < minLat && latit >= -180){minLat = latit;}
+          else if(latit > maxLat && latit <= 180)
+          {
+            maxLat = latit;
+          }
+          count++;
+        });
+        console.log(count);
+        console.log("MinLat: " + minLat + " MaxLat: " + maxLat + " MinLong: " + minLong + " MaxLong: " + maxLong);
+    });
+
+    // $.ajax({
+    //     url: "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'",
+    //     // https://data.detroitmi.gov/resource/8p3f-52zg.json?incidentdate=2012-12-27T00:00:00.000
+    //     type: "GET",
+    //     data: {
+    //       //"$limit" : 5000,
+    //       "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
+    //     }
+    // }).success(function(response) {
+    //   //build datastructures by distance away from us
+    //   console.log(response[0].location.coordinates);
+    //   var closeLocations = _.filter(response, function(response){ return  (response.location.coordinates[0] - longitude) <= 2 });
+    //   console.log(closeLocations);
+    //   // alert("Retrieved " + response.length + " records from the dataset!");
+    //   // console.log(response);
+    // });
+}
 
 $(document).ready(function() 
 {
