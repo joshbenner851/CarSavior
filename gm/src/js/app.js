@@ -1,5 +1,7 @@
-var longitude,latitude;
-var key = "AIzaSyCDW-naC3PPNM6OE_3Xii6vfiLs9Vwe7nY"
+var longitude = -83.045754;
+var latitude = 42.331427;
+var key = "AIzaSyCDW-naC3PPNM6OE_3Xii6vfiLs9Vwe7nY";
+var APITokenDetroitCrime = "8OPUdNc6B2smGxTa8vDn8Rpki";
 // Longitude and Latitude
     function success(position) {
       longitude = position.coords.longitude;
@@ -8,8 +10,8 @@ var key = "AIzaSyCDW-naC3PPNM6OE_3Xii6vfiLs9Vwe7nY"
       if ((longitude != undefined) && (latitude != undefined)) {
           var longText = document.getElementById('long');
           var latiText = document.getElementById('lati');
-          longText.innerHTML = longitude;
-          latiText.innerHTML = latitude;
+          // longText.innerHTML = longitude;
+          // latiText.innerHTML = latitude;
       }
       $.ajax({
         type: "GET",
@@ -53,7 +55,7 @@ function processData(data) {
   var speed = data.average_speed;
   if (speed !== undefined) {
     var speedText = document.getElementById('speed');
-    speedText.innerHTML = speed;
+    // speedText.innerHTML = speed;
   }
 }*/
 
@@ -92,7 +94,8 @@ $(document).ready(function() {
     
     gm.info.watchVehicleData(showActive, ['teen_driver_active']);
 
-    gm.info.watchPosition(success, true);
+    // Commented for testing purposes. Hard coded longitude / latitude above
+   //gm.info.watchPosition(success, true);
     
     gm.info.watchVehicleData(getHeadlight, ['bulb_center_fail']);
     gm.info.watchVehicleData(getOil, ['change_oil_ind']);
@@ -115,19 +118,25 @@ $(document).ready(function() {
     
 });
 
+function processPosition(position){
+  var lat = position.coords.latitude;
+  var lng = position.coords.longitude;
+}
 
-function getCrimeDataByCoordinates(longitude, latitude)
+function getCrimeDataByCoordinates(data)
 {
+  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
+  var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
+  var finalUrlString = baseUrlString.concat(dateParamter);
     $.ajax({
-        url: "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'",
-        // https://data.detroitmi.gov/resource/8p3f-52zg.json?incidentdate=2012-12-27T00:00:00.000
+        url: finalUrlString,
         type: "GET",
         data: {
-          //"$limit" : 5000,
-          "$$app_token" : "8OPUdNc6B2smGxTa8vDn8Rpki"
+          "$$app_token" : APITokenDetroitCrime
         }
     }).success(function(response) {
       alert("Retrieved " + response.length + " records from the dataset!");
+
       console.log(response);
     });
 }
