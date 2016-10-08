@@ -27,17 +27,33 @@
     <div id="wrapper">
       <div id="close"><img src="images/close.png" onclick="gm.system.closeApp()" alt="close"></div>
       <div id="main">
+        <div id="first">
+            <p id="teenControl"><strong>TeenWatch: <span style="color:green">ACTIVE</span></strong></p>
+            <img src="images/logo.png" id = "logo"/>
+            <h4>CarSavior allows monitoring of teen drivers (active driving and accident protection), lets you know where it is <strong>safe</strong> to park, and detects potential fixes to mechanical problems.</h4>
 
-        <p id="teenControl"><strong>TeenWatch: <span style="color:green">ACTIVE</span></strong></p>
-        <img src="images/logo.png" id = "logo"/>
-        <h4>CarSavior allows monitoring of teen drivers (active driving and accident protection) and lets you know where it is <strong>safe</strong> to park.</h4>
-          
-        <div class="instruments">
-            <button id="safe">Is it safe to park?</button>
-            <h3 id="safeStatus">...</h3>
+            <div class="instruments">
+                <button id="safe">Is it safe to park?</button>
+                <h3 id="safeStatus">...</h3>
+            </div>
         </div>
+<<<<<<< HEAD
         <div id="map" /> 
           
+=======
+        <div id="second">
+          <h1>Repair List</h1>
+            <div id = "headlight">
+                <h2 onclick="showHelpHeadlight()" id="headlightTitle">Headlight Malfunction</h2>
+                <iframe id="headlightVideo" width="385" height="217" src="https://www.youtube.com/embed/9RiqSjaaquA?start=219" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div id = "changeoil">
+                <h2 onclick="showHelpOil()" id="oilTitle">Oil Change Needed</h2>
+                <iframe id="oilVideo" width="385" height="217" src="https://www.youtube.com/embed/rYWcL76WMRg?start=219" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+        <button id="next">Repair</button>
+>>>>>>> master
         <p id = "footer">A project by Josh Benner, Nikush Dalia, Helena Narowski, and Ethan Silver.</p>
       </div>
     </div>

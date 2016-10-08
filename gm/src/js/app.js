@@ -55,6 +55,14 @@ function getCrimeDataByCoordinates(data)
     });
 }
 
+function showHelpHeadlight() {
+    $('#headlightVideo').toggle();
+}
+
+function showHelpOil() {
+    $('#oilVideo').toggle();
+}
+
 function processData(data) {
   console.log('got vehicle data: ', data);
   if (data.teen_drowsy_alerts > 3) {
@@ -69,6 +77,7 @@ function processData(data) {
   }
 }
 
+<<<<<<< HEAD
 // Intialize our map
 function initMap()
 {
@@ -81,14 +90,38 @@ function initMap()
 }
 
 function showSpeed(data) {
+=======
+/*function showSpeed(data) {
+>>>>>>> master
   console.log(data);
   var speed = data.average_speed;
   if (speed !== undefined) {
     var speedText = document.getElementById('speed');
     // speedText.innerHTML = speed;
   }
-}
+}*/
 
+<<<<<<< HEAD
+=======
+$(document).ready(function() {
+    
+    $('#second').hide();
+    $('#headlightTitle').hide();
+    $('#headlightVideo').hide();
+    $('#oilTitle').hide();
+    $('#oilVideo').hide();
+    
+    $('#next').click(function() {
+       $('#first').fadeToggle();
+       $('#second').fadeToggle();
+       $(this).text(function(i, text){
+          return text === "Main Menu" ? "Repair" : "Main Menu";
+      });
+    });
+    
+    //gm.info.watchVehicleData(showSpeed, ['average_speed']);
+    //gm.info.getVehicleData(showSpeed, ['average_speed']);
+>>>>>>> master
 
 /*
 Longitude
@@ -164,6 +197,25 @@ $(document).ready(function()
 
     // Commented for testing purposes. Hard coded longitude / latitude above
    //gm.info.watchPosition(success, true);
+    
+    gm.info.watchVehicleData(getHeadlight, ['bulb_center_fail']);
+    gm.info.watchVehicleData(getOil, ['change_oil_ind']);
+    
+    //Watch Headlight Malfunction
+    function getHeadlight(data) {
+        if (data.bulb_center_fail == 1) {
+            $('#headlightTitle').fadeIn(100);
+        }
+    }
+    
+    //Watch Oil Change
+    function getOil(data) {
+        if (data.change_oil_ind == '$1') {
+            $('#oilTitle').fadeIn(100);
+        }
+    }
+    
+    
     
 });
 
