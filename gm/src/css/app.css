@@ -25,3 +25,27 @@
     background-color: aqua;
     padding: 15px 32px;
 }
+
+#logo {
+    width:40%;
+    height:40%;
+    position: relative;
+    right: 75px;
+}
+
+#teenControl {
+    float: left;
+    position: relative;
+    left: 10px;
+    padding: 2px 2px 2px 2px;
+    border: solid;
+    border-color:darkred;
+}
+
+#footer {
+    float: right;
+    font-size: 10px;
+    position: relative;
+    top:7px;
+    right:10px;
+}
