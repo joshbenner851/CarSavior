@@ -79,6 +79,28 @@ function showHelpOil() {
     $('#oilVideo').toggle();
 }
 
+//Teen Active Alerter
+function showActive(data) {
+    if (data.teen_driver_active == '$1') {
+        $.post("https://maker.ifttt.com/trigger/active_teen/with/key/d-_zxVjZpr34awx2JXkRXM");
+        gm.info.getCurrentPosition(success, true);
+    }
+}
+
+//Watch Headlight Malfunction
+function getHeadlight(data) {
+    if (data.bulb_center_fail == 1) {
+        $('#headlightTitle').fadeIn(100);
+    }
+}
+
+//Watch Oil Change
+function getOil(data) {
+    if (data.change_oil_ind == '$1') {
+        $('#oilTitle').fadeIn(100);
+    }
+}
+
 function processData(data) {
   console.log('got vehicle data: ', data);
   if (data.teen_drowsy_alerts > 3) {
@@ -181,27 +203,6 @@ $(document).ready(function()
   });
 });
 
-//Teen Active Alerter
-  function showActive(data) {
-      if (data.teen_driver_active == '$1') {
-          $.post("https://maker.ifttt.com/trigger/active_teen/with/key/d-_zxVjZpr34awx2JXkRXM");
-          gm.info.getCurrentPosition(success, true);
-      }
-  }
-
-//Watch Headlight Malfunction
-  function getHeadlight(data) {
-      if (data.bulb_center_fail == 1) {
-          $('#headlightTitle').fadeIn(100);
-      }
-  }
-  
-  //Watch Oil Change
-  function getOil(data) {
-      if (data.change_oil_ind == '$1') {
-          $('#oilTitle').fadeIn(100);
-      }
-  }
 
 // ).then(function( records ) {
   //   var weightedCrimeOfRecords = getRankedCrimesForDistrict(records);
@@ -265,10 +266,10 @@ function getCrimeDataByCoordinatesLatLong(lati, longi)
           "$$app_token" : APITokenDetroitCrime
         },
     }).success(function(response){
-      if(response.length > 0 ){
-        alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
-      }
-      console.log(response);
+      // if(response.length > 0 ){
+      //   alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
+      // }
+      // console.log(response);
     })
   // Gets crime statistics for the entire detroit region, data set for 2014
 //       if(response.length > 0 ){
@@ -383,8 +384,9 @@ function getVariance()
   Promise.all(getDistricts).then(function(values) 
   {
     var i = 0;
-    $.each( values, function(item) {
-      diff = Math.pow((item.length - avgCrimePer8thMi),2);
+    $.each( values, function() {
+      var crimePointsForDistrict = getRankedCrimesForDistrict(values[i]);
+      diff = Math.pow((crimePointsForDistrict - avgCrimePer8thMi),2);
       sumDifferences += diff;
       i++;
     });
