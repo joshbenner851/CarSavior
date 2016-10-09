@@ -3,6 +3,10 @@
   text-align: center;
 }
 
+body {
+    background-color: rgb(247,247,247);
+}
+
 #close {
   position: absolute;
   top: 90px;
@@ -22,8 +26,9 @@
 }
 
 #safe {
-    background-color: blanchedalmond;
     padding: 15px 32px;
+    position: relative;
+    top: 14px;
 }
 
 #logo {
@@ -36,6 +41,7 @@
 #teenControl {
     float: left;
     position: relative;
+    top: 2px;
     left: 10px;
     padding: 2px 2px 2px 2px;
     border: solid;
@@ -45,8 +51,8 @@
 #next {
     float: right;
     position: absolute;
-    left: 85%;
-    bottom:8%;
+    left: 86%;
+    bottom:10%;
     padding: 10px 10px;
 }
 
