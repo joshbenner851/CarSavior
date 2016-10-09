@@ -205,8 +205,9 @@ $(document).ready(function()
 
   // Makes the "Is it safe to park" button actually do things. Basically rattles off statistics 
   $( "#safe" ).click(function() {
-    // getCrimeStatistics();
+    
     getMyAreaCrime();
+    getCrimeStatistics();
   });
 });
 
@@ -260,6 +261,23 @@ function getCrimeDataByCoordinates(lat1,long1)
       //console.log(response);
     });
 }
+// function getCrimeDataByCoordinates(data)
+// {
+//   var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
+//   var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
+//   var finalUrlString = baseUrlString.concat(dateParamter);
+//     $.ajax({
+//         url: finalUrlString,
+//         type: "GET",
+//         data: {
+//           "$$app_token" : APITokenDetroitCrime
+//         }
+//     }).success(function(response) {
+//       alert("Retrieved " + response.length + " records from the dataset!");
+
+//       console.log(response);
+//     });
+// }
 
 function getCrimeDataByCoordinatesLatLong(lati, longi)
 {
@@ -288,14 +306,13 @@ function getCrimeDataByCoordinatesLatLong(lati, longi)
   
 }
 
-function getDistrictCrime(latitude, longitude)
-{
-  var districtCrimes = getCrimeDataByCoordinates(latitude, longitude);
-  Promise.all([districtCrimes]).then(function(values){
-    return values[0].length;
-  });
-}
-
+// function getDistrictCrime(latitude, longitude)
+// {
+//   var districtCrimes = getCrimeDataByCoordinates(latitude, longitude);
+//   Promise.all([districtCrimes]).then(function(values){
+//     return values[0].length;
+//   });
+// }
 function getRankedCrimes(rank)
 {
   if (rank == 3) // Worst crimes, murder  etc
@@ -370,6 +387,7 @@ function getVariance()
   var sumDifferences = 0;
   var numOfDistricts = 0;
   var getDistricts = [];
+  var recommendedDistricts = [];
   var diff = 0;
   //Loop through the whole block of lat/longs that we have to calculate the 
   for(var i = minLat; i < minLat + blockToLatitude*5; i += blockToLatitude)
@@ -394,6 +412,13 @@ function getVariance()
       var crimePointsForDistrict = getRankedCrimesForDistrict(values[i]);
       //console.log(crimePointsForDistrict);
       //calculateStatistics(crimePointsForDistrict);
+      //if (crimePointsForDistrict + p value ? )
+
+      // Only if the car is in a dangerous place to begin with, which we will need the p value for 
+      if (crimePointsForDistrict < 75) // Primitive way, will use P value later on
+      {
+        recommendedDistricts.push(values[i]);
+      }
       diff = Math.pow((crimePointsForDistrict - avgCrimePer8thMi),2);
       sumDifferences += diff;
       i++;
@@ -403,6 +428,8 @@ function getVariance()
     console.log("Variance is: " + variance);
     stdDev = Math.pow(variance,.5);
     console.log("Std deviation is: " + stdDev)
+    var std = Math.pow(variance,.5);
+    console.log("recommended districts: ", recommendedDistricts);
   });
   
 
@@ -424,6 +451,9 @@ function calculateStatistics(weightVal)
   }
   else if(numStdDevsAway < -.5){
     $('#safe').text("This is a safe place to park");
+  }
+  else{
+    $('#safe').text("This may be a safe place to park");
   }
 }
     // $.ajax({
