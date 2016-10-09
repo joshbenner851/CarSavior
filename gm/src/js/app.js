@@ -11,6 +11,7 @@ var crimeAverage;
 var blockToLatitude = .5 / 69;
 var blockToLongitude = .5 / 69;
 var avgCrimePerSqMi, avgCrimePer8thMi;
+var mileRatioInBlock = .5; //half mile blocks
 
 
 function success(position) 
@@ -41,24 +42,6 @@ function success(position)
 function processPosition(position){
   var lat = position.coords.latitude;
   var lng = position.coords.longitude;
-}
-
-function getCrimeDataByCoordinates(data)
-{
-  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
-  var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
-  var finalUrlString = baseUrlString.concat(dateParamter);
-    $.ajax({
-        url: finalUrlString,
-        type: "GET",
-        data: {
-          "$$app_token" : APITokenDetroitCrime
-        }
-    }).success(function(response) {
-      alert("Retrieved " + response.length + " records from the dataset!");
-
-      console.log(response);
-    });
 }
 
 function showHelpHeadlight() {
@@ -194,9 +177,9 @@ $(document).ready(function()
   }
 
 
-function getCrimeDataByCoordinates(lati, longi)
+function getCrimeDataByCoordinatesLatLong(lati, longi)
 {
-  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + lati + ", "+ longi +", 500)";
+  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + lati + ", "+ longi +", 804.672)";
   var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
   var finalUrlString = baseUrlString.concat(dateParamter);
   return $.ajax({
@@ -204,41 +187,39 @@ function getCrimeDataByCoordinates(lati, longi)
         type: "GET",
         data: {
           "$$app_token" : APITokenDetroitCrime
-        }
+        },
     }).success(function(response) {
-      //alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
-      return response.length;
+      if(response.length > 0 ){
+        alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
+      }
+      //return response.length;
     });  
 }
+
+function getCrimeDataByCoordinates(data)
+{
+  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
+  var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
+  var finalUrlString = baseUrlString.concat(dateParamter);
+    $.ajax({
+        url: finalUrlString,
+        type: "GET",
+        data: {
+          "$$app_token" : APITokenDetroitCrime
+        }
+    }).success(function(response) {
+      alert("Retrieved " + response.length + " records from the dataset!");
+
+      console.log(response);
+    });
+}
+
 
 function getDistrictCrime(latitude, longitude)
 {
   var districtCrimes = getCrimeDataByCoordinates(latitude, longitude);
   Promise.all([districtCrimes]).then(values => {
     return values[0].length;
-  });
-}
-
-// 
-function getCrimeStatistics() {
-  var rankedCrimes = []
-  rankedCrimes.push(getRankedCrimes(1));
-  rankedCrimes.push(getRankedCrimes(2));
-  rankedCrimes.push(getRankedCrimes(3));
-
-  Promise.all(rankedCrimes).then(values => { 
-    var crimeWeightedTotal = 0;
-    var i = 1;
-    $.each( values, function() {
-      crimeWeightedTotal += ($(this).length)*i;
-      i++;
-    });
-     alert("Crime Total: "+ crimeWeightedTotal);
-     var crimePoints = crimeWeightedTotal;
-     avgCrimePerSqMi = crimePoints / sqMiles;
-     //We'll be pulling data around you by the 8th of a mile radius so we need to convert
-     avgCrimePer8thMi = avgCrimePerSqMi / 8;
-     getVariance();
   });
 }
 
@@ -279,8 +260,6 @@ function getRankedCrimes(rank)
     }).success(function(responseFilteredRank) {
       // alert("Retrieved " + responseFilteredRank.length + " of rank " + rank + ".");
       console.log(responseFilteredRank);
-
-
     });
 
 }
@@ -295,14 +274,36 @@ function getRankedCrimes(rank)
 // X degree's latitude = .125 miles
 
 
+function getCrimeStatistics() {
+  var rankedCrimes = []
+  rankedCrimes.push(getRankedCrimes(1));
+  rankedCrimes.push(getRankedCrimes(2));
+  rankedCrimes.push(getRankedCrimes(3));
 
+  Promise.all(rankedCrimes).then(values => { 
+    var crimeWeightedTotal = 0;
+    var i = 1;
+    $.each( values, function() {
+      crimeWeightedTotal += ($(this).length)*i;
+      i++;
+    });
+     alert("Crime Total: "+ crimeWeightedTotal);
+     var crimePoints = crimeWeightedTotal;
+     avgCrimePerSqMi = crimePoints / sqMiles;
+     //We'll be pulling data around you by the 8th of a mile radius so we need to convert
+     avgCrimePer8thMi = avgCrimePerSqMi / mileRatioInBlock;
+     getVariance();
+  });
+}
 
 //MinLat: 42.2556 MaxLat: 42.5442 MinLong: -83.2975 MaxLong: -82.9099
 function getVariance()
 {
-  var sumDifferences;
+  var sumDifferences = 0;
   var numOfDistricts = 0;
   console.log("start adding shit");
+  var getDistricts = [];
+  var diff = 0;
   //Loop through the whole block of lat/longs that we have to calculate the 
   for(var i = minLat; i < minLat + blockToLatitude*3; i += blockToLatitude)
   {
@@ -313,16 +314,27 @@ function getVariance()
       //.125 
       //This is returning null for some reason, the getCrimeData is being weird. I think it has to do with the function
       //calling a promise and it not returning in time
-      var diff = Math.pow((getCrimeDataByCoordinates(i,x) - avgCrimePer8thMi),2);
-      sumDifferences += diff;
+      getDistricts.push(getCrimeDataByCoordinatesLatLong(i,x));
+      // var avgForDistrict = getCrimeDataByCoordinatesLatLong(i,x);
       numOfDistricts++;
     }
   }
-  console.log("finished adding shit" , numOfDistricts);
-  console.log("sumDifferences: " + sumDifferences);
-  var variance = sumDifferences / numOfDistricts;
-  console.log("Variance is: " + variance);
-  var std = Math.pow(variance,.5);
+
+  Promise.all(getDistricts).then(function(values) 
+  {
+    var i = 0;
+    $.each( values, function() {
+      diff = Math.pow((values[i].length - avgCrimePer8thMi),2);
+      sumDifferences += diff;
+      i++;
+    });
+    console.log("finished adding shit" , numOfDistricts);
+    console.log("sumDifferences: " + sumDifferences);
+    var variance = sumDifferences / numOfDistricts;
+    console.log("Variance is: " + variance);
+    var std = Math.pow(variance,.5);
+  });
+  
 
 }
 //variance = sum(# - Avg) / radius
