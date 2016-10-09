@@ -5,14 +5,13 @@ var numOfCrimes;
 //Total area: 398.21 mi² (1,031.36 km²)
 var sqMiles = 398.21;
 var key = "AIzaSyCDW-naC3PPNM6OE_3Xii6vfiLs9Vwe7nY";
-var APITokenDetroitCrime = "8OPUdNc6B2smGxTa8vDn8Rpki";
+var APITokenDetroitCrime = "X6GrU2jxr5ISyxSK5OJU8YjuY";
 var crimeAverage;
 
 var blockToLatitude = .5 / 69;
 var blockToLongitude = .5 / 69;
 var avgCrimePerSqMi, avgCrimePer8thMi;
 var mileRatioInBlock = .5; //half mile blocks
-
 
 function success(position) 
 {
@@ -44,8 +43,6 @@ function processPosition(position){
   var lat = position.coords.latitude;
   var lng = position.coords.longitude;
 }
-
-
 
 // Returns ajax promise of crime just for your area. 
 function getMyAreaCrime(data)
@@ -80,6 +77,28 @@ function showHelpHeadlight() {
 
 function showHelpOil() {
     $('#oilVideo').toggle();
+}
+
+//Teen Active Alerter
+function showActive(data) {
+    if (data.teen_driver_active == '$1') {
+        $.post("https://maker.ifttt.com/trigger/active_teen/with/key/d-_zxVjZpr34awx2JXkRXM");
+        gm.info.getCurrentPosition(success, true);
+    }
+}
+
+//Watch Headlight Malfunction
+function getHeadlight(data) {
+    if (data.bulb_center_fail == 1) {
+        $('#headlightTitle').fadeIn(100);
+    }
+}
+
+//Watch Oil Change
+function getOil(data) {
+    if (data.change_oil_ind == '$1') {
+        $('#oilTitle').fadeIn(100);
+    }
 }
 
 function processData(data) {
@@ -184,63 +203,19 @@ $(document).ready(function()
   });
 });
 
-//Teen Active Alerter
-  function showActive(data) {
-      if (data.teen_driver_active == '$1') {
-          $.post("https://maker.ifttt.com/trigger/active_teen/with/key/d-_zxVjZpr34awx2JXkRXM");
-          gm.info.getCurrentPosition(success, true);
-      }
-  }
 
-//Watch Headlight Malfunction
-  function getHeadlight(data) {
-      if (data.bulb_center_fail == 1) {
-          $('#headlightTitle').fadeIn(100);
-      }
-  }
-  
-  //Watch Oil Change
-  function getOil(data) {
-      if (data.change_oil_ind == '$1') {
-          $('#oilTitle').fadeIn(100);
-      }
-  }
-
-
-function getCrimeDataByCoordinatesLatLong(lati, longi)
-{
-  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + lati + ", "+ longi +", 804.672)";
-  var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
-  var finalUrlString = baseUrlString.concat(dateParamter);
-  return $.ajax({
-        url: finalUrlString,
-        type: "GET",
-        data: {
-          "$$app_token" : APITokenDetroitCrime
-        },
-    }).success(function(response) {
-
-      // alert("Retrieved " + response.length + " records from the dataset in a surrounding district (not weighted)");
-      // return response.length;
-    });
-  // ).then(function( records ) {
+// ).then(function( records ) {
   //   var weightedCrimeOfRecords = getRankedCrimesForDistrict(records);
   //   alert("Retrieved " + weightedCrimeOfRecords + " records from the dataset in a surrounding district (weighted)");
   //   return weightedCrimeOfRecords;
 
   // });
-}
-
 // returns the numerical value of crime for a district. 
 // not really valid anymore because I just made the other function return an actual numeric value instead of ajax promise
 // function getDistrictCrime(latitude, longitude)
 // {
 //   var districtCrimes = getCrimeDataByCoordinates(latitude, longitude);
 //   Promise.all([districtCrimes]).then(values => {
-
-//     // this line for testing purposes
-//     alert("old non weighted: " + values[0].length + " new weighted: " + getRankedCrimesForDistrict(values[0]));
-//     // can delete it later
 
 //     return getRankedCrimesForDistrict(values[0]);
 //   });
@@ -261,14 +236,6 @@ function getRankedCrimesForDistrict(crimeObjects)
   return weightedTotal;
 }
 
-// Gets crime statistics for the entire detroit region, data set for 2014
-//       if(response.length > 0 ){
-//         alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
-//       }
-//       //return response.length;
-//     });  
-// }
-
 function getCrimeDataByCoordinates(data)
 {
   var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
@@ -287,6 +254,32 @@ function getCrimeDataByCoordinates(data)
     });
 }
 
+function getCrimeDataByCoordinatesLatLong(lati, longi)
+{
+  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + lati + ", "+ longi +", 804.672)";
+  var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
+  var finalUrlString = baseUrlString.concat(dateParamter);
+  return $.ajax({
+        url: finalUrlString,
+        type: "GET",
+        data: {
+          "$$app_token" : APITokenDetroitCrime
+        },
+    }).success(function(response){
+      // if(response.length > 0 ){
+      //   alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
+      // }
+      // console.log(response);
+    })
+  // Gets crime statistics for the entire detroit region, data set for 2014
+//       if(response.length > 0 ){
+//         alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
+//       }
+//       //return response.length;
+//     });  
+// }
+  
+}
 
 function getDistrictCrime(latitude, longitude)
 {
@@ -295,9 +288,6 @@ function getDistrictCrime(latitude, longitude)
     return values[0].length;
   });
 }
-
-
-
 
 function getRankedCrimes(rank)
 {
@@ -351,7 +341,7 @@ function getCrimeStatistics() {
   rankedCrimes.push(getRankedCrimes(2));
   rankedCrimes.push(getRankedCrimes(3));
 
-  Promise.all(rankedCrimes).then(values => { 
+  Promise.all(rankedCrimes).then(function(values) { 
     var crimeWeightedTotal = 0;
     var i = 1;
     $.each( values, function() {
@@ -395,7 +385,8 @@ function getVariance()
   {
     var i = 0;
     $.each( values, function() {
-      diff = Math.pow((values[i].length - avgCrimePer8thMi),2);
+      var crimePointsForDistrict = getRankedCrimesForDistrict(values[i]);
+      diff = Math.pow((crimePointsForDistrict - avgCrimePer8thMi),2);
       sumDifferences += diff;
       i++;
     });
