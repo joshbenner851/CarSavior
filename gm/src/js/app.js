@@ -1,6 +1,6 @@
 var longitude = maxLong = minLong = -83.114405;
 var latitude = maxLat = minLat =  42.435412;
-var numOfCrimes;
+var numOfCrimes, stdDev;
 
 //Total area: 398.21 mi² (1,031.36 km²)
 var sqMiles = 398.21;
@@ -40,13 +40,17 @@ function success(position)
 
 // Don't  think we actually use this
 function processPosition(position){
-  var lat = position.coords.latitude;
-  var lng = position.coords.longitude;
+  latitude = position.coords.latitude;
+  longitude = position.coords.longitude;
 }
 
 // Returns ajax promise of crime just for your area. 
 function getMyAreaCrime(data)
 {
+  //calculateStatistics();
+  //gm.info.getCurrentPosition (processPosition, true);
+  latitude = 42.352750;
+  longitude =  -83.031598;
   var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
   var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
   var finalUrlString = baseUrlString.concat(dateParamter);
@@ -58,8 +62,9 @@ function getMyAreaCrime(data)
         }
     }).success(function(response) {
       alert("Retrieved " + response.length + " crime records from the dataset in your area! (Not Weighted)");
-      alert("The weighted value of this is " +getRankedCrimesForDistrict(response) );
-      console.log(response);
+      calculateStatistics(getRankedCrimesForDistrict(response));
+      //alert("The weighted value of this is " + getRankedCrimesForDistrict(response) );
+      //console.log(response);
     });
 }
 
@@ -180,7 +185,10 @@ $(document).ready(function()
      $(this).text(function(i, text){
         return text === "Main Menu" ? "Repair" : "Main Menu";
     });
+
   });
+
+  
     
   // Call processData will all available signals. Expect a 5+ second delay before callback is triggered
   gm.info.getVehicleData(processData);
@@ -199,7 +207,6 @@ $(document).ready(function()
   $( "#safe" ).click(function() {
     // getCrimeStatistics();
     getMyAreaCrime();
-
   });
 });
 
@@ -236,9 +243,9 @@ function getRankedCrimesForDistrict(crimeObjects)
   return weightedTotal;
 }
 
-function getCrimeDataByCoordinates(data)
+function getCrimeDataByCoordinates(lat1,long1)
 {
-  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
+  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + lat1 + ", "+ long1 +", 500)";
   var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
   var finalUrlString = baseUrlString.concat(dateParamter);
     $.ajax({
@@ -250,7 +257,7 @@ function getCrimeDataByCoordinates(data)
     }).success(function(response) {
       alert("Retrieved " + response.length + " records from the dataset!");
 
-      console.log(response);
+      //console.log(response);
     });
 }
 
@@ -270,7 +277,7 @@ function getCrimeDataByCoordinatesLatLong(lati, longi)
       //   alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
       // }
       // console.log(response);
-    })
+    });
   // Gets crime statistics for the entire detroit region, data set for 2014
 //       if(response.length > 0 ){
 //         alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
@@ -320,7 +327,7 @@ function getRankedCrimes(rank)
         }
     }).success(function(responseFilteredRank) {
       // alert("Retrieved " + responseFilteredRank.length + " of rank " + rank + ".");
-      console.log(responseFilteredRank);
+      //console.log(responseFilteredRank);
     });
 
 }
@@ -348,7 +355,7 @@ function getCrimeStatistics() {
       crimeWeightedTotal += ($(this).length)*i;
       i++;
     });
-     alert("Crime Total: "+ crimeWeightedTotal);
+     //alert("Crime Total: "+ crimeWeightedTotal);
      var crimePoints = crimeWeightedTotal;
      avgCrimePerSqMi = crimePoints / sqMiles;
      //We'll be pulling data around you by the 8th of a mile radius so we need to convert
@@ -362,13 +369,12 @@ function getVariance()
 {
   var sumDifferences = 0;
   var numOfDistricts = 0;
-  console.log("start adding shit");
   var getDistricts = [];
   var diff = 0;
   //Loop through the whole block of lat/longs that we have to calculate the 
-  for(var i = minLat; i < minLat + blockToLatitude*3; i += blockToLatitude)
+  for(var i = minLat; i < minLat + blockToLatitude*5; i += blockToLatitude)
   {
-    for(var x = minLong; x < minLong + blockToLongitude * 3; x += blockToLongitude)
+    for(var x = minLong; x < minLong + blockToLongitude * 5; x += blockToLongitude)
     {
       //Fix this to take any coordinates;
       //Return the crime points for that district
@@ -386,15 +392,17 @@ function getVariance()
     var i = 0;
     $.each( values, function() {
       var crimePointsForDistrict = getRankedCrimesForDistrict(values[i]);
+      //console.log(crimePointsForDistrict);
+      //calculateStatistics(crimePointsForDistrict);
       diff = Math.pow((crimePointsForDistrict - avgCrimePer8thMi),2);
       sumDifferences += diff;
       i++;
     });
-    console.log("finished adding shit" , numOfDistricts);
-    console.log("sumDifferences: " + sumDifferences);
+    //console.log("sumDifferences: " + sumDifferences);
     var variance = sumDifferences / numOfDistricts;
     console.log("Variance is: " + variance);
-    var std = Math.pow(variance,.5);
+    stdDev = Math.pow(variance,.5);
+    console.log("Std deviation is: " + stdDev)
   });
   
 
@@ -405,13 +413,18 @@ function getVariance()
 //We should make a significant amount of calls unless filtering is going to be easier(highly doubtful)
 
 //FUCK MY LIFE
-function calculateStatistics(stuff)
+function calculateStatistics(weightVal)
 {
-  
-  var p = (num - avgCrimePer8thMi) / stdDev;
-
-
-
+  getCrimeStatistics();
+  var yourDistrictCrime = weightVal
+  var numStdDevsAway = (yourDistrictCrime - avgCrimePer8thMi) / stdDev;
+  console.log("You're :" , numStdDevsAway, " std dev's from the mean of: " , avgCrimePer8thMi);
+  if(numStdDevsAway > .5){
+    $('#safe').text("You're in a really bad part of town");
+  }
+  else if(numStdDevsAway < -.5){
+    $('#safe').text("This is a safe place to park");
+  }
 }
     // $.ajax({
     //     url: "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'",
