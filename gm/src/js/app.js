@@ -124,6 +124,7 @@ function getCrimeDataByYear()
     });
 }
 
+
 $(document).ready(function() 
 {
   $('#second').hide();
@@ -133,12 +134,13 @@ $(document).ready(function()
   $('#oilVideo').hide();
   
   $('#next').click(function() {
-     $('#first').fadeToggle();
-     $('#second').fadeToggle();
+     $('#first').toggle();
+     $('#second').toggle();
      $(this).text(function(i, text){
         return text === "Main Menu" ? "Repair" : "Main Menu";
     });
   });
+    
   // Call processData will all available signals. Expect a 5+ second delay before callback is triggered
   gm.info.getVehicleData(processData);
 
@@ -218,11 +220,37 @@ function getCrimeDataByCoordinates(data)
 function getDistrictCrime(latitude, longitude)
 {
   var districtCrimes = getCrimeDataByCoordinates(latitude, longitude);
-  Promise.all([districtCrimes]).then(values => {
+  Promise.all([districtCrimes]).then(function(values){
     return values[0].length;
   });
 }
 
+<<<<<<< HEAD
+=======
+// 
+function getCrimeStatistics() {
+  var rankedCrimes = []
+  rankedCrimes.push(getRankedCrimes(1));
+  rankedCrimes.push(getRankedCrimes(2));
+  rankedCrimes.push(getRankedCrimes(3));
+
+  Promise.all(rankedCrimes).then(function(values){ 
+    var crimeWeightedTotal = 0;
+    var i = 1;
+    $.each( values, function() {
+      crimeWeightedTotal += ($(this).length)*i;
+      i++;
+    });
+     alert("Crime Total: "+ crimeWeightedTotal);
+     var crimePoints = crimeWeightedTotal;
+     avgCrimePerSqMi = crimePoints / sqMiles;
+     //We'll be pulling data around you by the 8th of a mile radius so we need to convert
+     avgCrimePer8thMi = avgCrimePerSqMi / 8;
+     getVariance();
+  });
+}
+
+>>>>>>> master
 function getRankedCrimesForDistrict()
 {
 
