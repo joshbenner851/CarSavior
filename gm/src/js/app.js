@@ -1,5 +1,11 @@
-var longitude = maxLong = minLong = -83.114405;
-var latitude = maxLat = minLat =  42.435412;
+// Coordinates for safe part of town to test that functionality
+// var longitude = maxLong = minLong = -83.114405;
+// var latitude = maxLat = minLat =  42.435412;
+
+// Coordinates for Mexicotown - apparently mid level dangerous
+var longitude = maxLong = minLong = -83.0952
+var latitude = maxLat = minLat =  42.3188;
+
 var numOfCrimes;
 
 //Total area: 398.21 mi² (1,031.36 km²)
@@ -39,7 +45,7 @@ function success(position)
   });
 }
 
-function convertCoordsToAddress(coordinates) 
+function convertCoordsToAddress(coordinates, crimeValue) 
 {
   var y = coordinates[0];
   var x = coordinates[1];
@@ -49,7 +55,16 @@ function convertCoordsToAddress(coordinates)
   }).success(function(response)
   {
       console.log(response.results[0].formatted_address);
-       $('#locations').append( '<span>' + response.results[0].formatted_address +'</span> <br>');
+      if (crimeValue < 150)
+      {
+        $('#locations').append( '<span>' + response.results[0].formatted_address +' <img style="width: 25px; height: 25px;" src="images/check.png"> </span>  <br>');
+      }
+      else
+      {
+        $('#locations').append( '<span>' + response.results[0].formatted_address +' <img style="width: 25px; height: 25px;" src="images/check-yellow.gif"> </span>  <br>');
+      }
+
+       
   });
 }
 
@@ -386,7 +401,7 @@ function getCrimeStatistics() {
       crimeWeightedTotal += ($(this).length)*i;
       i++;
     });
-     alert("Crime Total: "+ crimeWeightedTotal);
+     // alert("Crime Total: "+ crimeWeightedTotal);
      var crimePoints = crimeWeightedTotal;
      avgCrimePerSqMi = crimePoints / sqMiles;
      //We'll be pulling data around you by the 8th of a mile radius so we need to convert
@@ -405,9 +420,9 @@ function getVariance()
   var recommendedDistricts = [];
   var diff = 0;
   //Loop through the whole block of lat/longs that we have to calculate the 
-  for(var i = minLat; i < minLat + blockToLatitude*3; i += blockToLatitude)
+  for(var i = minLat; i < minLat + blockToLatitude*6; i += blockToLatitude)
   {
-    for(var x = minLong; x < minLong + blockToLongitude * 3; x += blockToLongitude)
+    for(var x = minLong; x < minLong + blockToLongitude * 6; x += blockToLongitude)
     {
       //Fix this to take any coordinates;
       //Return the crime points for that district
@@ -428,9 +443,12 @@ function getVariance()
       //if (crimePointsForDistrict + p value ? )
 
       // Only if the car is in a dangerous place to begin with, which we will need the p value for 
-      if (crimePointsForDistrict < 150) // Primitive way, will use our district's weighted value instead of 75 probably
-      {                                   // That will grab all the safer districts. Lowest val are highest in recommendation
-        recommendedDistricts.push(values[i][0].location);
+      if (myDistrictCrimeRate > 300)
+      { // approximation
+        if (crimePointsForDistrict < 200) // Primitive way, will use our district's weighted value instead of 75 probably
+        {                                   // That will grab all the safer districts. Lowest val are highest in recommendation
+          recommendedDistricts.push([values[i][0].location, crimePointsForDistrict]);
+        }
       }
       diff = Math.pow((crimePointsForDistrict - avgCrimePer8thMi),2);
       sumDifferences += diff;
@@ -443,16 +461,20 @@ function getVariance()
     var std = Math.pow(variance,.5);
     console.log("recommended districts: ", recommendedDistricts);
 
+
     $('#locations span').empty();
+    $("#locations br").remove();
+
     // document.getElementById("locations").innerHTML = "";
-    if (myDistrictCrimeRate > 100) // approximation
+    if (myDistrictCrimeRate > 300) // approximation
     {
-      alert("You are in a high crime area - we are analyzing statistics to find you safe spots to park nearby.");
+      alert("You are in a high crime area ("+ myDistrictCrimeRate +"). We are analyzing statistics to find you safe spots to park nearby.");
       $.each(recommendedDistricts, function(index, value){
 
-          if (value != undefined)
+          if (value != undefined && value[0] != undefined && value[1] != undefined)
           {
-            convertCoordsToAddress(value.coordinates);
+            // alert("value yo" + value[1]);
+            convertCoordsToAddress(value[0].coordinates, value[1]);
             // $('#locations').html( '<span>' + (index+1) + ". " + value.coordinates +'</span>');
           }
           
@@ -460,7 +482,7 @@ function getVariance()
     }
     else
     {
-      $('#locations').append( '<span>' + "You are in a low crime area and it is safe to park nearby." +'</span> <br>');
+      $('#locations').append( '<span>' + "You are in a low crime area and it is safe to park nearby." +'<img style="width: 25px; height: 25px; padding-left: 5px;" src="images/check.png"> </span> <br>');
     }
   });
 
