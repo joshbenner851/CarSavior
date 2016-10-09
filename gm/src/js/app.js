@@ -92,15 +92,15 @@ function processData(data) {
 }
 
 // Intialize our map
-function initMap()
-{
-  var center = new google.maps.LatLng(42.351517,-83.0705137);
-  var mapOptions = {
-    zoom: 8,
-    center: center
-  }
-  var map = new google.maps.Map(document.getElementById("map"), mapOptions);
-}
+//function initMap()
+//{
+//  var center = new google.maps.LatLng(42.351517,-83.0705137);
+//  var mapOptions = {
+//    zoom: 8,
+//    center: center
+//  }
+//  var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+//}
 
 /*
 Longitude
