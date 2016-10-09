@@ -70,14 +70,19 @@ function convertCoordsToAddress(coordinates, crimeValue)
 
 // Don't  think we actually use this
 function processPosition(position){
-  var lat = position.coords.latitude;
-  var lng = position.coords.longitude;
+  latitude = position.coords.latitude;
+  console.log(position.coords.latitude);
+  longitude = position.coords.longitude;
+  console.log(position.coords.longitude);
 }
 
 // Returns ajax promise of crime just for your area. 
 function getMyAreaCrime(data)
 {
+    
+  gm.info.getCurrentPosition(processPosition, true);
   var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
+  console.log("latitude: " , latitude);
   var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
   var finalUrlString = baseUrlString.concat(dateParamter);
   return $.ajax({
@@ -199,6 +204,9 @@ function getCrimeDataByYear()
 
 $(document).ready(function() 
 {
+    
+  gm.info.watchPosition(processPosition, true)
+
   $('#second').hide();
   $('#third').hide();
   $('#headlightTitle').hide();
