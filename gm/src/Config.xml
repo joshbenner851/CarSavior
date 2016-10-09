@@ -2,7 +2,7 @@
 <gmWebApp>
   <AppID>0</AppID>
   <AppType>RemoteHigh</AppType>
-  <FriendlyName>Hello World</FriendlyName>
+  <FriendlyName>CarSavior</FriendlyName>
   <VehicleStatus>Drive</VehicleStatus>
   <AutoStart>false</AutoStart>
   <AppCategory>General</AppCategory>
@@ -11,14 +11,14 @@
   <AppVersion>0.1.0</AppVersion>
   <SetupURL>setup.html</SetupURL>
   <LocalPath>App0</LocalPath>
-  <Developer>Nikush Dalia</Developer>
+  <Developer>Josh Benner, Helena Narowski, Nikush Dalia, Ethan Silver</Developer>
   <TrustedApp>false</TrustedApp>
   <RequestedBy>1</RequestedBy>
   <TestApp>true</TestApp>
   <VIN>ALLVINS</VIN>
   <Description>
     <de>Hallo Welt!</de>
-    <en>Hellow World!</en>
+    <en>CarSavior, a suite of tools to keep you, your family, and your car safe.</en>
     <es>Hola Mundo!</es>
     <fr>Bonjour le monde!</fr>
     <it>Ciao mondo!</it>
