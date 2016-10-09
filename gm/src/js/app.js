@@ -92,15 +92,15 @@ function processData(data) {
 }
 
 // Intialize our map
-function initMap()
-{
-  var center = new google.maps.LatLng(42.351517,-83.0705137);
-  var mapOptions = {
-    zoom: 8,
-    center: center
-  }
-  var map = new google.maps.Map(document.getElementById("map"), mapOptions);
-}
+//function initMap()
+//{
+//  var center = new google.maps.LatLng(42.351517,-83.0705137);
+//  var mapOptions = {
+//    zoom: 8,
+//    center: center
+//  }
+//  var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+//}
 
 /*
 Longitude
@@ -219,21 +219,19 @@ function getDistrictCrime(latitude, longitude)
   });
 }
 
+// 
 function getCrimeStatistics() {
   var rankedCrimes = []
-  rankedCrimes.push(getRankedCrimes(3));
   rankedCrimes.push(getRankedCrimes(1));
-
   rankedCrimes.push(getRankedCrimes(2));
-  // $.when(rankedCrimes).then( function(results){
-  //       alert('all complete');
-  // });
+  rankedCrimes.push(getRankedCrimes(3));
 
   Promise.all(rankedCrimes).then(values => { 
-   
     var crimeWeightedTotal = 0;
+    var i = 1;
     $.each( values, function() {
-      crimeWeightedTotal += $(this).length;
+      crimeWeightedTotal += ($(this).length)*i;
+      i++;
     });
      alert("Crime Total: "+ crimeWeightedTotal);
      var crimePoints = crimeWeightedTotal;
@@ -242,6 +240,11 @@ function getCrimeStatistics() {
      avgCrimePer8thMi = avgCrimePerSqMi / 8;
      getVariance();
   });
+}
+
+function getRankedCrimesForDistrict()
+{
+
 }
 
 function getRankedCrimes(rank)
@@ -274,10 +277,9 @@ function getRankedCrimes(rank)
           "$$app_token" : APITokenDetroitCrime
         }
     }).success(function(responseFilteredRank) {
+      // alert("Retrieved " + responseFilteredRank.length + " of rank " + rank + ".");
+      console.log(responseFilteredRank);
 
-      alert("Retrieved: " + responseFilteredRank.length + " of rank " + rank + ".");
-      // console.log(responseFilteredRank);
-      return responseFilteredRank.length;
 
     });
 
