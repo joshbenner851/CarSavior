@@ -12,6 +12,7 @@ var blockToLatitude = .5 / 69;
 var blockToLongitude = .5 / 69;
 var avgCrimePerSqMi, avgCrimePer8thMi;
 var mileRatioInBlock = .5; //half mile blocks
+var myDistrictCrimeRate = 0;
 
 function success(position) 
 {
@@ -38,6 +39,20 @@ function success(position)
   });
 }
 
+function convertCoordsToAddress(coordinates) 
+{
+  var y = coordinates[0];
+  var x = coordinates[1];
+  $.ajax({
+    type: "GET",
+    url: "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + x + "," +  y + "&key=" + key,
+  }).success(function(response)
+  {
+      console.log(response.results[0].formatted_address);
+       $('#locations').append( '<span>' + response.results[0].formatted_address +'</span> <br>');
+  });
+}
+
 // Don't  think we actually use this
 function processPosition(position){
   var lat = position.coords.latitude;
@@ -57,8 +72,9 @@ function getMyAreaCrime(data)
           "$$app_token" : APITokenDetroitCrime
         }
     }).success(function(response) {
-      alert("Retrieved " + response.length + " crime records from the dataset in your area! (Not Weighted)");
-      alert("The weighted value of this is " +getRankedCrimesForDistrict(response) );
+      // alert("Retrieved " + response.length + " crime records from the dataset in your area! (Not Weighted)");
+      // alert("The weighted value of this is " +getRankedCrimesForDistrict(response) );
+      myDistrictCrimeRate = getRankedCrimesForDistrict(response);
       console.log(response);
     });
 }
@@ -169,6 +185,7 @@ function getCrimeDataByYear()
 $(document).ready(function() 
 {
   $('#second').hide();
+  $('#third').hide();
   $('#headlightTitle').hide();
   $('#headlightVideo').hide();
   $('#oilTitle').hide();
@@ -176,12 +193,33 @@ $(document).ready(function()
   
   $('#next').click(function() {
      $('#first').toggle();
-     $('#second').toggle();
+     if (!$('#third').is(":visible"))
+     {
+        $('#second').toggle();
+     }
+     $('#third').hide();
+     
+     // {
+     //    $('#second').hide();
+     // }
+     // else {
+     //  $('#second').show();
+     // }
      $(this).text(function(i, text){
         return text === "Main Menu" ? "Repair" : "Main Menu";
     });
   });
-    
+     
+  $('#safe').click(function() {
+    getMyAreaCrime();
+    getCrimeStatistics();
+     $('#first').toggle();
+     // $('#second').hide();
+     $('#third').toggle();
+     $('#next').text(function(i, text){
+        return text === "Main Menu" ? "Recommended" : "Main Menu";
+    });
+  }); 
   // Call processData will all available signals. Expect a 5+ second delay before callback is triggered
   gm.info.getVehicleData(processData);
 
@@ -196,12 +234,12 @@ $(document).ready(function()
   gm.info.watchVehicleData(getOil, ['change_oil_ind']);
 
   // Makes the "Is it safe to park" button actually do things. Basically rattles off statistics 
-  $( "#safe" ).click(function() {
+  // $( "#safe" ).click(function() {
     
-    getMyAreaCrime();
-    getCrimeStatistics();
+  //   getMyAreaCrime();
+  //   getCrimeStatistics();
 
-  });
+  // });
 });
 
 
@@ -390,9 +428,9 @@ function getVariance()
       //if (crimePointsForDistrict + p value ? )
 
       // Only if the car is in a dangerous place to begin with, which we will need the p value for 
-      if (crimePointsForDistrict < 75) // Primitive way, will use P value later on
-      {
-        recommendedDistricts.push(values[i]);
+      if (crimePointsForDistrict < 150) // Primitive way, will use our district's weighted value instead of 75 probably
+      {                                   // That will grab all the safer districts. Lowest val are highest in recommendation
+        recommendedDistricts.push(values[i][0].location);
       }
       diff = Math.pow((crimePointsForDistrict - avgCrimePer8thMi),2);
       sumDifferences += diff;
@@ -404,8 +442,27 @@ function getVariance()
     console.log("Variance is: " + variance);
     var std = Math.pow(variance,.5);
     console.log("recommended districts: ", recommendedDistricts);
+
+    $('#locations span').empty();
+    // document.getElementById("locations").innerHTML = "";
+    if (myDistrictCrimeRate > 100) // approximation
+    {
+      alert("You are in a high crime area - we are analyzing statistics to find you safe spots to park nearby.");
+      $.each(recommendedDistricts, function(index, value){
+
+          if (value != undefined)
+          {
+            convertCoordsToAddress(value.coordinates);
+            // $('#locations').html( '<span>' + (index+1) + ". " + value.coordinates +'</span>');
+          }
+          
+      });
+    }
+    else
+    {
+      $('#locations').append( '<span>' + "You are in a low crime area and it is safe to park nearby." +'</span> <br>');
+    }
   });
-  
 
 }
 //variance = sum(# - Avg) / radius
