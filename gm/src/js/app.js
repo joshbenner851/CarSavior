@@ -39,9 +39,31 @@ function success(position)
   });
 }
 
+// Don't  think we actually use this
 function processPosition(position){
   var lat = position.coords.latitude;
   var lng = position.coords.longitude;
+}
+
+
+
+// Returns ajax promise of crime just for your area. 
+function getMyAreaCrime(data)
+{
+  var baseUrlString = "https://data.detroitmi.gov/resource/8p3f-52zg.json?$where=within_circle(location, " + latitude + ", "+ longitude +", 500)";
+  var dateParamter = "AND incidentdate between '2014-01-10T12:00:00' and '2014-12-10T14:00:00'";
+  var finalUrlString = baseUrlString.concat(dateParamter);
+  return $.ajax({
+        url: finalUrlString,
+        type: "GET",
+        data: {
+          "$$app_token" : APITokenDetroitCrime
+        }
+    }).success(function(response) {
+      alert("Retrieved " + response.length + " crime records from the dataset in your area! (Not Weighted)");
+      alert("The weighted value of this is " +getRankedCrimesForDistrict(response) );
+      console.log(response);
+    });
 }
 
 function showHelpHeadlight() {
@@ -153,7 +175,13 @@ $(document).ready(function()
   
   gm.info.watchVehicleData(getHeadlight, ['bulb_center_fail']);
   gm.info.watchVehicleData(getOil, ['change_oil_ind']);
-  
+
+  // Makes the "Is it safe to park" button actually do things. Basically rattles off statistics 
+  $( "#safe" ).click(function() {
+    // getCrimeStatistics();
+    getMyAreaCrime();
+
+  });
 });
 
 //Teen Active Alerter
@@ -191,12 +219,55 @@ function getCrimeDataByCoordinatesLatLong(lati, longi)
           "$$app_token" : APITokenDetroitCrime
         },
     }).success(function(response) {
-      if(response.length > 0 ){
-        alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
-      }
-      //return response.length;
-    });  
+
+      // alert("Retrieved " + response.length + " records from the dataset in a surrounding district (not weighted)");
+      // return response.length;
+    });
+  // ).then(function( records ) {
+  //   var weightedCrimeOfRecords = getRankedCrimesForDistrict(records);
+  //   alert("Retrieved " + weightedCrimeOfRecords + " records from the dataset in a surrounding district (weighted)");
+  //   return weightedCrimeOfRecords;
+
+  // });
 }
+
+// returns the numerical value of crime for a district. 
+// not really valid anymore because I just made the other function return an actual numeric value instead of ajax promise
+// function getDistrictCrime(latitude, longitude)
+// {
+//   var districtCrimes = getCrimeDataByCoordinates(latitude, longitude);
+//   Promise.all([districtCrimes]).then(values => {
+
+//     // this line for testing purposes
+//     alert("old non weighted: " + values[0].length + " new weighted: " + getRankedCrimesForDistrict(values[0]));
+//     // can delete it later
+
+//     return getRankedCrimesForDistrict(values[0]);
+//   });
+// }
+
+// Returns the weighted value of a districts crime rate
+function getRankedCrimesForDistrict(crimeObjects)
+{
+  var i =0;
+  var weightedTotal = 0;
+  for (i; i < crimeObjects.length; i++)
+  {
+    var crimeLevel = parseInt(crimeObjects[i].stateoffensefileclass);
+    if (crimeLevel >= 25000 && crimeLevel < 32000 ) weightedTotal += 1;
+    else if (crimeLevel >= 15000 && crimeLevel < 25000 ) weightedTotal += 2;
+    else if (crimeLevel < 15000) weightedTotal += 3;
+  }
+  return weightedTotal;
+}
+
+// Gets crime statistics for the entire detroit region, data set for 2014
+//       if(response.length > 0 ){
+//         alert("Retrieved " + response.length + " records from the dataset! Damn thats a lot of crime!");
+//       }
+//       //return response.length;
+//     });  
+// }
 
 function getCrimeDataByCoordinates(data)
 {
@@ -225,10 +296,15 @@ function getDistrictCrime(latitude, longitude)
   });
 }
 
+<<<<<<< HEAD
 function getRankedCrimesForDistrict()
 {
 
 }
+=======
+
+
+>>>>>>> master
 
 function getRankedCrimes(rank)
 {
