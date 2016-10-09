@@ -225,32 +225,6 @@ function getDistrictCrime(latitude, longitude)
   });
 }
 
-<<<<<<< HEAD
-=======
-// 
-function getCrimeStatistics() {
-  var rankedCrimes = []
-  rankedCrimes.push(getRankedCrimes(1));
-  rankedCrimes.push(getRankedCrimes(2));
-  rankedCrimes.push(getRankedCrimes(3));
-
-  Promise.all(rankedCrimes).then(function(values){ 
-    var crimeWeightedTotal = 0;
-    var i = 1;
-    $.each( values, function() {
-      crimeWeightedTotal += ($(this).length)*i;
-      i++;
-    });
-     alert("Crime Total: "+ crimeWeightedTotal);
-     var crimePoints = crimeWeightedTotal;
-     avgCrimePerSqMi = crimePoints / sqMiles;
-     //We'll be pulling data around you by the 8th of a mile radius so we need to convert
-     avgCrimePer8thMi = avgCrimePerSqMi / 8;
-     getVariance();
-  });
-}
-
->>>>>>> master
 function getRankedCrimesForDistrict()
 {
 
@@ -351,8 +325,8 @@ function getVariance()
   Promise.all(getDistricts).then(function(values) 
   {
     var i = 0;
-    $.each( values, function() {
-      diff = Math.pow((values[i].length - avgCrimePer8thMi),2);
+    $.each( values, function(item) {
+      diff = Math.pow((item[i].length - avgCrimePer8thMi),2);
       sumDifferences += diff;
       i++;
     });
